@@ -24,6 +24,8 @@ client.on("connect", () => {
 });
 
 client.on("message", (topic, message) => {
+    const agora = new Date();
+    const horario = agora.toLocaleTimeString("pt-BR");
     const texto = message.toString();
     console.log("Mensagem recebida:", texto);
     document.getElementById("mensagem").innerText = horario+ " - Luminosidade em LUX - "+ texto;
