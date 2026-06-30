@@ -10,23 +10,46 @@ const client = mqtt.connect(`wss://${mqtt_server}:${mqtt_port}/mqtt`, {
 });
 
 client.on("connect", () => {
-    console.log("Conectado ao broker MQTT");
-    document.getElementById("status").innerText = "Conectado";
+
+    console.log("Conectado!");
+
+    document.getElementById("status").innerHTML = "🟢 Conectado";
     document.getElementById("status").className = "badge bg-success";
-    // Inscreve no tópico
-    client.subscribe(topic, (erro) => {
-        if (erro) {
-            console.log("Erro ao inscrever no tópico" , erro);
-        } else {
-            console.log("Inscrito no tópico:", topic);
-        }
-    });
+
+    client.subscribe(topic);
+
 });
 
 client.on("message", (topic, message) => {
+
+    const lux = parseFloat(message.toString());
+
     const agora = new Date();
-    const horario = agora.toLocaleTimeString("pt-BR");
-    const texto = message.toString();
-    console.log("Mensagem recebida:", texto);
-    document.getElementById("mensagem").innerText = horario+ " - Luminosidade em LUX - "+ texto;
+
+    document.getElementById("hora").innerHTML =
+        "Atualizado: " + agora.toLocaleTimeString("pt-BR");
+
+    document.getElementById("valorLux").innerHTML = lux.toFixed(0);
+
+    document.getElementById("mensagem").innerHTML =
+        agora.toLocaleTimeString("pt-BR") +
+        " • Luminosidade: <b>" + lux + " LUX</b>";
+
+    // barra de progresso
+    // considerando máximo de 1000 lux
+    let porcentagem = (lux / 1000) * 100;
+
+    if (porcentagem > 100)
+        porcentagem = 100;
+
+    document.getElementById("barraLux").style.width =
+        porcentagem + "%";
+
+});
+
+client.on("error", () => {
+
+    document.getElementById("status").innerHTML = "🔴 Desconectado";
+    document.getElementById("status").className = "badge bg-danger";
+
 });
